@@ -1,0 +1,19 @@
+#!/bin/bash
+
+systemctl restart iptables
+systemctl enable iptables
+
+for i in `curl https://raw.githubusercontent.com/beetware/beetwarePublic/master/ipv4list.txt`; do
+  echo "[i] IPv4 $i whitelisted."
+  iptables -I INPUT -p tcp -m multiport --dports http,https -s $i -j ACCEPT;
+done
+
+for i in `curl https://raw.githubusercontent.com/beetware/beetwarePublic/master/ipv6list.txt`; do 
+  echo "[i] IPv6 $i whitelisted."
+  ip6tables -I INPUT -p tcp -m multiport --dports http,https -s $i -j ACCEPT;
+done
+
+iptables -A INPUT -p tcp -m multiport --dports http,https -j DROP
+ip6tables -A INPUT -p tcp -m multiport --dports http,https -j DROP
+service iptables save
+iptables-save
