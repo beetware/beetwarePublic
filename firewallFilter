@@ -1,7 +1,20 @@
 #!/bin/bash
 
+# Origin-side firewall filter rules.
+# with these rules, any attack bypassing Beetware CDN and commencing through origin server will be dropped by iptables.
+# Run this BASH script on your host.
+# NOTE: Setting this script as cron is recommended.
+
 systemctl restart iptables
 systemctl enable iptables
+
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+iptables -t nat -F
+iptables -t mangle -F
+iptables -F
+iptables -X
 
 for i in `curl https://raw.githubusercontent.com/beetware/beetwarePublic/master/ipv4list.txt`; do
   echo "[i] IPv4 $i whitelisted."
